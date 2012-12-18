@@ -1,0 +1,15 @@
+/*
+ * jquery.lazyload.css
+ */
+
+.no-js .ctg-lazyload-img {
+    display: none;
+}
+
+.ctg-lazyload-img {
+    visibility: hidden;
+}
+
+.ctg-lazyload-img-is-loaded {
+    visibility: visible;
+}
