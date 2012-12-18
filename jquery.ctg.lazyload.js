@@ -36,8 +36,7 @@ undef: true, unused: true, strict: true, trailing: true, browser: true */
             selector: '.ctg-lazyload-img',
             offset: 200,
             transitionSpeed: 500,
-            autoDestroy: true, // if window is scrolled to bottom, lazyload will be destroyed
-            init: null
+            autoDestroy: true // if window is scrolled to bottom, lazyload will be destroyed
         },
 
         _create: function () {
