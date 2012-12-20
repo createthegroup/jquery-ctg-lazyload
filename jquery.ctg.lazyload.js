@@ -6,7 +6,7 @@ undef: true, unused: true, strict: true, trailing: true, browser: true */
 /*
  * jquery.lazyload.js
  *
- * Lazyloads images below the fold
+ * Lazyloads images/background images below the fold
  *
  * depends:
  *     jquery.js
@@ -19,7 +19,7 @@ undef: true, unused: true, strict: true, trailing: true, browser: true */
 
     var _super = $.Widget.prototype,
 
-        // checks whether scrollbar has scrolled all the way down
+    // checks whether scrollbar has scrolled all the way down
         isBottom = function () {
 
             var win = $(window),
@@ -36,6 +36,7 @@ undef: true, unused: true, strict: true, trailing: true, browser: true */
             selector: '.ctg-lazyload-img',
             offset: 200,
             transitionSpeed: 500,
+            afterLoad: $.noop,
             autoDestroy: true // if window is scrolled to bottom, lazyload will be destroyed
         },
 
@@ -76,7 +77,13 @@ undef: true, unused: true, strict: true, trailing: true, browser: true */
         _events: function () {
 
             var self = this,
-                didScroll = true;
+                didScroll = true,
+                didResize = true;
+
+            // bind to resize
+            $(window).bind('resize.ctg-lazyload', function () {
+                didResize = true;
+            });
 
             // determine if scrolled
             $(window).bind('scroll.ctg-lazyload', function () {
@@ -86,11 +93,12 @@ undef: true, unused: true, strict: true, trailing: true, browser: true */
             // poll to avoid running scroll handler everytime scroll event fires
             this.interval = setInterval(function () {
 
-                if (didScroll) {
+                if (didScroll || didResize) {
                     didScroll = false;
+                    didResize = false;
 
                     self._checkImages();
-                    
+
                     // if we're at the bottom destroy
                     if (self.options.autoDestroy && isBottom()) {
                         self.destroy();
@@ -110,10 +118,10 @@ undef: true, unused: true, strict: true, trailing: true, browser: true */
                 visibleArea = viewportHeight + scrollTop + self.options.offset;
 
             this.objects.images.each(function () {
-                
+
                 var el = $(this),
                     offset = el.data('ctgLazyloadOffset');
-                    
+
                 if (el.data('ctgLazyloadImgIsLoaded')) {
                     return;
                 }
@@ -127,36 +135,44 @@ undef: true, unused: true, strict: true, trailing: true, browser: true */
             return;
         },
 
-        _loadImage: function (image) {
-        
+        _loadImage: function (el) {
+
             var self = this;
+
+            el.data('ctgLazyloadImgIsLoaded', true);
 
             // NOTE: IE6 requires load event to be bound before
             // src attribute is added (in case image is pulled
             // in from browser cache)
-            image
-                .data('ctgLazyloadImgIsLoaded', true)
-                .hide()
-                .load(function () {
+            $('<img/>')
+                .bind('load.ctg-lazyload', function () {
                     
-                    $(this)
-                        .addClass('ctg-lazyload-img-is-loaded')
-                        .fadeIn(self.options.transitionSpeed);
+                    el.hide();
                     
+                    if (el.is('img')) {
+                        el.attr('src', el.data('src'));
+                    } else {
+                        el.css('background-image', 'url(' + el.data('src') + ')');
+                    }
+
+                    el.addClass('ctg-lazyload-img-is-loaded')
+                        .fadeIn();
+
+                    self.options.afterLoad.call(undefined, this);
                 })
-                .attr('src', image.data('src'));
+                .attr('src', el.data('src'));
 
             return;
         },
-        
+
         // if live is true, we recache elements
         // (useful for when new images have been added with ajax)
         refresh: function (live) {
-            
+
             if (live) {
                 this._objects();
             }
-            
+
             this._setOffsets();
             this._checkImages();
 

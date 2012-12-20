@@ -11,9 +11,9 @@
 		        </noscript>
 	        </li>
 	        <li class="product">
-	    		<img data-src="/path/to/image.jpg" width="170" height="300" class="ctg-lazyload-img" />
+	    		<div data-src="/path/to/image.jpg" class="ctg-lazyload-img"></div>
 		        <noscript>
-		            <img src="/path/to/image.jpg" width="170" height="300" />
+		            <div style="background-image: url('/path/to/image.jpg');"></div>
 		        </noscript>
 	        </li>
     	</ul>
@@ -36,8 +36,11 @@ Images that appear below the window height + offset will be loaded in.
 #### transitionSpeed: 500 (number)
 Sets the speed of image fade.
 
+#### afterLoad: $.noop (function)
+Callback runs as each image has loaded. The loaded image/element is passed to this function.
+
 #### autoDestroy: true (boolean)
-When set to trye the lazyload widget will be destroyed once the page has been scrolled to the bottom.
+When set to true the lazyload widget will be destroyed once the page has been scrolled to the bottom.
 
 ### Methods
 #### refresh .lazyload('refresh', [live])
