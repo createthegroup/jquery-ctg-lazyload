@@ -4,7 +4,7 @@ immed: true, indent: 4, latedef: true, newcap: true, nonew: true, quotmark: sing
 undef: true, unused: true, strict: true, trailing: true, browser: true */
 
 /*
- * jquery.lazyload.js
+ * jquery.lazyload.js v0.1.1
  *
  * Lazyloads images/background images below the fold
  *
@@ -36,8 +36,10 @@ undef: true, unused: true, strict: true, trailing: true, browser: true */
             selector: '.ctg-lazyload-img',
             offset: 200,
             transitionSpeed: 500,
-            afterLoad: $.noop,
-            autoDestroy: true // if window is scrolled to bottom, lazyload will be destroyed
+            autoDestroy: true, // if window is scrolled to bottom, lazyload will be destroyed
+            
+            create: null,
+            load: null
         },
 
         _create: function () {
@@ -158,7 +160,9 @@ undef: true, unused: true, strict: true, trailing: true, browser: true */
                     el.addClass('ctg-lazyload-img-is-loaded')
                         .fadeIn();
 
-                    self.options.afterLoad.call(undefined, this);
+                    self._trigger('load', null, {
+                        src: el.data('src')
+                    });
                 })
                 .attr('src', el.data('src'));
 
